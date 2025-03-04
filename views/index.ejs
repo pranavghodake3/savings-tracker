@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction</title>
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="alert alert-success hide"></div>
+        <div class="alert alert-danger hide"></div>
+        <div class="panel-group savingstracker-stats">
+            <div class="panel panel-default">
+                <div class="panel-heading add-savingstracker-title">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" id="add-savingstracker-collaps-btn" href="#collapse1">Add Transaction</a>
+                    </h4>
+                </div>
+                <div id="collapse1" class="panel-collapse collapse">
+                    <form id="add-savingstracker-form">
+                        <div id="fieldsContainer">
+                            <div class="form-group">
+                                <select name="categoryId" class="form-control category-field" onchange="loadSubCategories(this)" required>
+                                    <option value="">Select Category</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <select name="subCategoryId" class="form-control sub-category-field">
+                                    <option value="">Select Sub Category</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <input type="text" name="new_sub_category" class="form-control new-sub-category-field" placeholder="New Sub Category">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" name="amount" class="form-control amount-field" placeholder="Amount">
+                            </div>
+                            <div class="form-group">
+                                <input type="date" name="date" class=" form-control date-field" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="submit-btn">Submit</button>
+                        <button type="button" class="btn btn-default" onclick="onCancelClick(this);">Cancel</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="panel-group expense-stats">
+            <div class="panel panel-default">
+                <div class="panel-heading stats-title">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" href="#stats-body">Stats</a>
+                    </h4>
+                </div>
+                <div id="stats-body" class="panel-collapse collapse">
+                    <table class="table table-bordered savingstrackers-table">
+                        <thead>
+                            <tr>
+                                <th colspan="4" id="totalSavings"></th>
+                            </tr>
+                            <tr>
+                                <th colspan="2">Savings</th>
+                                <th colspan="2">Lent</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stats-table-body">
+                          <tr>
+                          </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <form id="update-savingstracker-form" class="update-savingstracker-form hide">
+            <div id="fieldsContainer">
+                <div class="form-group">
+                    <select name="categoryId" class="form-control category-field" onchange="loadSubCategories(this)" required>
+                        <option value="">Select Category</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <select name="subCategoryId" class="form-control sub-category-field">
+                        <option value="">Select Subcategory</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <input type="text" name="new_sub_category" class="form-control new-sub-category-field" placeholder="New Sub Category">
+                </div>
+                <div class="form-group">
+                    <input type="text" name="amount" class="form-control amount-field" placeholder="Amount">
+                </div>
+                <div class="form-group">
+                    <input type="date" name="date" class=" form-control date-field" required>
+                </div>
+                <input type="hidden" name="savingstracker_id" class="savingstracker-id-field">
+            </div>
+            <button type="submit" class="btn btn-primary" id="update-btn">Update</button>
+            <button type="button" class="btn btn-default" onclick="cancelUpdateTransaction(this);">Cancel</button>
+        </form>
+        <div class="row">
+            <div class="form-group">
+                <input type="text" name="search" id="search" placeholder="Search" onkeyup="searchTable()">
+                <button type="button" onclick="document.getElementById('search').value = '';searchTable();">Clear</button>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordered savingstrackers-table">
+                <tbody id="savingstrackers"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="./script.js"></script>
+    <script src="/node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+</body>
+</html>

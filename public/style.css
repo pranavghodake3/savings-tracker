@@ -1,0 +1,109 @@
+body {
+    font-family: Arial, sans-serif;
+    /* background-color: #f4f4f4; */
+    text-align: center;
+}
+.container{
+    padding-top: 5px;
+}
+
+h1 {
+    color: #333;
+}
+table{
+    text-align: left;
+}
+.table-bordered {
+    border: 1px solid #ddd;
+}
+tr.date-row {
+    font-size: 13px;
+    font-weight: bold;
+    color: green;
+    /* border: 2px solid #ddc0c0; */
+    /* background: #f1f0f0; */
+}
+.title {
+    font-size: 15px;
+    font-weight: bold;
+}
+.category {
+    font-size: 13px;
+    color: brown;
+}
+.amount {
+    font-size: 14px;
+    font-weight: bold;
+}
+.savingstracker-row td {
+    padding: 3px 5px 3px 5px !important;
+}
+/* .panel-heading.stats-title{
+    margin-top: 8px;
+} */
+.panel-group.savingstracker-stats {
+    margin-bottom: 7px;
+}
+.panel-heading {
+    padding: 5px 0px;
+}
+.row.savingstracker-info{
+    margin: 0 1px 7px;
+    background: antiquewhite;
+    padding: 5px;
+}
+.single-savingstracker-form{
+    border: 1px solid #d4d1d1;
+    padding: 6px;
+    margin-bottom: 6px;
+}
+.single-savingstracker-form .form-group {
+    margin-bottom: 3px;
+}
+.remove-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    color: red;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* .remove-btn::before {
+    content: '\2716';
+} */
+.alert {
+    padding: 5px;
+    margin-bottom: 5px;
+}
+.alert.hide{
+    display: none;
+}
+#stats-table-body tr td:first-child {
+    text-align: right;
+    width: 50%;
+}
+.form-group {
+    margin-bottom: 5px;
+}
+form{
+    margin-bottom: 3px;
+}
+.panel-heading.stats-title{
+    background: #ccf1cc;
+}
+.panel-heading.add-savingstracker-title{
+    background: #c1c1dd;
+}
+.row.savingstracker-info{
+    font-size: 17px;
+    background-color: pink;
+}
+#savingstrackers tr td:first-child {
+    cursor: pointer;
+}
+.table-savingstracker-field{
+    font-size: 15px;
+}
