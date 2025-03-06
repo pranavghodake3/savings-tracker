@@ -319,7 +319,7 @@ async function loadTransactions(){
                     <input type="hidden" name="savingstracker-field" class="savingstracker-field" value='${JSON.stringify(transactions[i])}'>
                 `;
                 cell_l.addEventListener("click", editTransaction);
-                cell_2.innerHTML = `&#8377;  ${transactions[i].amount}`;
+                cell_2.innerHTML = `&#8377;  ${transactions[i].amount.toLocaleString()}`;
                 cell_3.innerHTML = `${formatDate(transactions[i].date)}`;
                 cell_4.innerHTML = `
                     <input type="hidden" name="id" class="id-field" value="${transactions[i]._id}">

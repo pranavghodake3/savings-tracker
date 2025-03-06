@@ -14,6 +14,12 @@ const getcategory = async(id) => {
     return data;
 };
 
+const getCategoryByCondition = async(condition) => {
+    const data = await categoryModel.findOne(condition);
+
+    return data;
+};
+
 const create = async(body) => {
     const categoryModelObj = new categoryModel(body);
     const data = await categoryModelObj.save();
@@ -39,4 +45,5 @@ module.exports = {
     create,
     updatecategory,
     deletecategory,
+    getCategoryByCondition,
 };
