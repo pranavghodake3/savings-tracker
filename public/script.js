@@ -319,7 +319,7 @@ async function loadTransactions(){
                     <input type="hidden" name="savingstracker-field" class="savingstracker-field" value='${JSON.stringify(transactions[i])}'>
                 `;
                 cell_l.addEventListener("click", editTransaction);
-                cell_2.innerHTML = `${transactions[i].amount}`;
+                cell_2.innerHTML = `&#8377;  ${transactions[i].amount}`;
                 cell_3.innerHTML = `${formatDate(transactions[i].date)}`;
                 cell_4.innerHTML = `
                     <input type="hidden" name="id" class="id-field" value="${transactions[i]._id}">
@@ -379,17 +379,18 @@ function calculateTotal() {
         rowDiv = document.createElement("div");
         rowDiv.classList.add("row");
         rowDiv.innerHTML = `
-            <div class="col-xs-3">${savingEntries[i] ? savingEntries[i][0] : '&nbsp;'.toLocaleString()}</div>
-            <div class="col-xs-3">${savingEntries[i] ? savingEntries[i][1] : '&nbsp;'.toLocaleString()}</div>
-            <div class="col-xs-3">${lentEntries[i] ? lentEntries[i][0] : '&nbsp;'.toLocaleString()}</div>
-            <div class="col-xs-3">${lentEntries[i] ? lentEntries[i][1] : '&nbsp;'.toLocaleString()}</div>
+            <div class="col-xs-3">${savingEntries[i] ? savingEntries[i][0] : '&nbsp;'}</div>
+            <div class="col-xs-3">${savingEntries[i] ? '&#8377; '+savingEntries[i][1] : '&nbsp;'.toLocaleString()}</div>
+            <div class="col-xs-3">${lentEntries[i] ? lentEntries[i][0] : '&nbsp;'}</div>
+            <div class="col-xs-3">${lentEntries[i] ? '&#8377; '+lentEntries[i][1] : '&nbsp;'.toLocaleString()}</div>
         `;
         statsTbl.append(rowDiv);
     }
     rowDiv = document.createElement("div");
     rowDiv.classList.add("row");
+    rowDiv.classList.add("total-savings");
     rowDiv.innerHTML = `
-        <div class="col-xs-12">Total Savings: <b>${savings.totalAmount.toLocaleString()}</b></div>
+        <div class="col-xs-12">Total Savings: <b>&#8377;  ${savings.totalAmount.toLocaleString()}</b></div>
     `;
     statsTbl.append(rowDiv);
 }
