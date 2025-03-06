@@ -107,3 +107,14 @@ form{
 .table-savingstracker-field{
     font-size: 15px;
 }
+.stats-table .col-xs-3, .stats-table .col-xs-6{
+    border: 1px solid #d8d8d8;
+}
+.stats-table, .stats-table .row{
+    padding-left: 15px;
+    padding-right: 15px;
+}
+.row.heading {
+    font-weight: bold;
+    font-size: 17px;
+}

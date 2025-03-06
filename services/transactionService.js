@@ -18,12 +18,13 @@ const gettransaction = async(id) => {
 };
 
 const create = async(body) => {
-    const { date, categoryId, subCategoryId, newSubCategory, amount } = body;
+    const { date, categoryId, subCategoryId, newSubCategory, amount, mainCategorySlug } = body;
     let finalSubCategoryId = subCategoryId;
     if (newSubCategory) {
         const newSubCategoryCreated = await categoryService.create({
             name: newSubCategory,
-            parent: categoryId
+            main: false,
+            slug: mainCategorySlug,
         });
         finalSubCategoryId = newSubCategoryCreated._id;
     }
@@ -40,12 +41,13 @@ const create = async(body) => {
 };
 
 const updatetransaction = async(id, body) => {
-    const { date, categoryId, subCategoryId, newSubCategory, amount } = body;
+    const { date, categoryId, subCategoryId, newSubCategory, amount, mainCategorySlug } = body;
     let finalSubCategoryId = subCategoryId;
     if (newSubCategory) {
         const newSubCategoryCreated = await categoryService.create({
             name: newSubCategory,
-            parent: categoryId
+            main: false,
+            slug: mainCategorySlug,
         });
         finalSubCategoryId = newSubCategoryCreated._id;
     }

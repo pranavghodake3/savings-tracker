@@ -1,6 +1,6 @@
 const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 let categories = [];
-let arrangedCategories = {};
+let arrangedCategoriesById = {};
 let transactions = [];
 document.querySelectorAll(".date-field").forEach(input => {
     input.value = new Date().toISOString().split('T')[0];
@@ -26,7 +26,7 @@ document.getElementById("add-savingstracker-form").addEventListener("submit", as
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({categoryId, subCategoryId, newSubCategory, amount, date}),
+            body: JSON.stringify({categoryId, subCategoryId, newSubCategory, amount, date, mainCategorySlug: arrangedCategoriesById[categoryId].slug}),
         });
         formSubmitData = await formSubmitData.json();
         if(formSubmitData.status){
@@ -104,10 +104,15 @@ async function loadCategories(){
     response = await response.json();
     categories = response.data.categories;
     document.querySelectorAll(".category-field").forEach(select => {
+        select.innerHTML = '';
+        option = document.createElement("option");
+        option.value = '';
+        option.text = 'Select Category';
+        select.appendChild(option);
         response.data.categories.forEach(category => {
-            arrangedCategories[category._id] = category.name;
-            if(category.parent == 0){
-                let option = document.createElement("option");
+            arrangedCategoriesById[category._id] = category;
+            if(category.main){
+                option = document.createElement("option");
                 option.value = category._id;
                 option.text = category.name;
                 select.appendChild(option);
@@ -115,9 +120,8 @@ async function loadCategories(){
         });
     });
 }
-function loadSubCategories(current = null, categoryId = null){
-    const compareCategoryId = categoryId ? categoryId : current.value;
-    console.log("compareCategoryId: ",compareCategoryId)
+function loadSubCategories(current = null, compareMainCategorySlug = null){
+    compareMainCategorySlug = compareMainCategorySlug ? compareMainCategorySlug : arrangedCategoriesById[current.value].slug;
     document.querySelectorAll(".sub-category-field").forEach(select => {
         select.innerHTML = '';
         let option = document.createElement("option");
@@ -125,7 +129,7 @@ function loadSubCategories(current = null, categoryId = null){
         option.text = 'Select Sub Category';
         select.appendChild(option);
         categories.forEach(category => {
-            if(category.parent == compareCategoryId){
+            if(!category.main && category.slug == compareMainCategorySlug){
                 let option = document.createElement("option");
                 option.value = category._id;
                 option.text = category.name;
@@ -224,7 +228,7 @@ function editTransaction() {
     savingstrackerData = JSON.parse(savingstrackerData);
     const form = document.getElementById("update-savingstracker-form");
     form.querySelector('.category-field').value = savingstrackerData.categoryId;
-    loadSubCategories(null, savingstrackerData.categoryId);
+    loadSubCategories(null, arrangedCategoriesById[savingstrackerData.categoryId].slug);
     form.querySelector('.sub-category-field').value = savingstrackerData.subCategoryId;
     form.querySelector('.amount-field').value = savingstrackerData.amount;
     form.querySelector('.date-field').value = new Date(savingstrackerData.date).toISOString().split('T')[0];
@@ -251,7 +255,7 @@ document.getElementById("update-savingstracker-form").addEventListener("submit",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({categoryId, subCategoryId, newSubCategory, amount, date}),
+            body: JSON.stringify({categoryId, subCategoryId, newSubCategory, amount, date, mainCategorySlug: arrangedCategoriesById[categoryId].slug}),
         });
         formSubmitData = await formSubmitData.json();
         if(formSubmitData.status){
@@ -310,8 +314,8 @@ async function loadTransactions(){
                 cell_4 = row.insertCell(3);
 
                 cell_l.innerHTML = `
-                    <div class="title">${arrangedCategories[transactions[i].categoryId]}</div>
-                    <div class="category">${arrangedCategories[transactions[i].subCategoryId]}</div>
+                    <div class="title">${arrangedCategoriesById[transactions[i].categoryId].name}</div>
+                    <div class="category">${arrangedCategoriesById[transactions[i].subCategoryId].name}</div>
                     <input type="hidden" name="savingstracker-field" class="savingstracker-field" value='${JSON.stringify(transactions[i])}'>
                 `;
                 cell_l.addEventListener("click", editTransaction);
@@ -330,7 +334,7 @@ async function loadTransactions(){
             let cell1 = row.insertCell(0);
             cell1.colSpan = 5;
             cell1.style.textAlign  = "center";
-            cell1.textContent = "No savingstrackers";
+            cell1.textContent = "No Transactions";
         }
     }else{
         cell1.textContent = data.error;
@@ -346,53 +350,48 @@ function calculateTotal() {
       totalAmount: 0,
     };
     transactions.forEach(e => {
-      if (arrangedCategories[e.categoryId] == "Savings") {
-        if (typeof savings.savings[arrangedCategories[e.subCategoryId]] == 'undefined') savings.savings[arrangedCategories[e.subCategoryId]] = 0;
-        savings.savings[arrangedCategories[e.subCategoryId]] += e.amount;
+      if (arrangedCategoriesById[e.categoryId].name == "Savings") {
+        if (typeof savings.savings[arrangedCategoriesById[e.subCategoryId].name] == 'undefined') savings.savings[arrangedCategoriesById[e.subCategoryId].name] = 0;
+        savings.savings[arrangedCategoriesById[e.subCategoryId].name] += e.amount;
         savings.totalAmount += e.amount;
       }
-      if (arrangedCategories[e.categoryId] == "Lent") {
-        if (typeof savings.lent[arrangedCategories[e.subCategoryId]] == 'undefined') savings.lent[arrangedCategories[e.subCategoryId]] = 0;
-        savings.lent[arrangedCategories[e.subCategoryId]] += e.amount;
+      if (arrangedCategoriesById[e.categoryId].name == "Lent") {
+        if (typeof savings.lent[arrangedCategoriesById[e.subCategoryId].name] == 'undefined') savings.lent[arrangedCategoriesById[e.subCategoryId].name] = 0;
+        savings.lent[arrangedCategoriesById[e.subCategoryId].name] += e.amount;
         savings.totalAmount += e.amount;
       }
-      if (arrangedCategories[e.categoryId] == "Lent Received") {
-        savings.lent[arrangedCategories[e.subCategoryId]] -= e.amount;
+      if (arrangedCategoriesById[e.categoryId].name == "Lent Received") {
+        savings.lent[arrangedCategoriesById[e.subCategoryId]] -= e.amount;
         savings.totalAmount -= e.amount;
       }
-      if (arrangedCategories[e.categoryId] == "Kharch") {
-        savings.savings[arrangedCategories[e.subCategoryId]] -= e.amount;
+      if (arrangedCategoriesById[e.categoryId].name == "Kharch") {
+        savings.savings[arrangedCategoriesById[e.subCategoryId].name] -= e.amount;
         savings.kharch += e.amount;
         savings.totalAmount -= e.amount;
       }
     });
-    console.log("savings: ", savings)
-    const statsTableBody = document.getElementById("stats-table-body");
-    const html = '';
-    document.getElementById("totalSavings").innerHTML = savings.totalAmount;
-    for (const cat in savings) {
-        if(typeof savings[cat] == 'object'){
-            for (const sub in savings[cat]) {
-                console.log("Entries: ",Object.entries(savings[cat]).length)
-                if(Object.entries(savings[cat]).length > 0){
-                    let row = statsTableBody.insertRow();
-                    cell_1 = row.insertCell(0);
-                    cell_2 = row.insertCell(1);
-                    cell_3 = row.insertCell(2);
-                    cell_4 = row.insertCell(3);
-                    console.log(sub, " == ",savings[cat][sub])
-                    if (cat == 'savings') {
-                        cell_1.innerHTML = sub;
-                        cell_2.innerHTML = savings[cat][sub];
-                    }else if(cat == 'lent'){
-                        cell_3.innerHTML = sub;
-                        cell_4.innerHTML = savings[cat][sub];
-                    }
-                    console.log("cell_1: ",cell_1)
-                }
-            }
-        }
+    const savingEntries = Object.entries(savings.savings);
+    const lentEntries = Object.entries(savings.lent);
+    const maxLoop = Math.max(savingEntries.length, lentEntries.length);
+    const statsTbl = document.getElementById("stats-body");
+    let rowDiv = document.createElement("div");
+    for (let i = 0; i < maxLoop; i++) {
+        rowDiv = document.createElement("div");
+        rowDiv.classList.add("row");
+        rowDiv.innerHTML = `
+            <div class="col-xs-3">${savingEntries[i] ? savingEntries[i][0] : '&nbsp;'.toLocaleString()}</div>
+            <div class="col-xs-3">${savingEntries[i] ? savingEntries[i][1] : '&nbsp;'.toLocaleString()}</div>
+            <div class="col-xs-3">${lentEntries[i] ? lentEntries[i][0] : '&nbsp;'.toLocaleString()}</div>
+            <div class="col-xs-3">${lentEntries[i] ? lentEntries[i][1] : '&nbsp;'.toLocaleString()}</div>
+        `;
+        statsTbl.append(rowDiv);
     }
+    rowDiv = document.createElement("div");
+    rowDiv.classList.add("row");
+    rowDiv.innerHTML = `
+        <div class="col-xs-12">Total Savings: <b>${savings.totalAmount.toLocaleString()}</b></div>
+    `;
+    statsTbl.append(rowDiv);
 }
 
 window.onload = async function(){

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transaction</title>
+    <title>Savings Tracker</title>
     <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="./style.css">
 </head>
@@ -35,7 +35,7 @@
                                 <input type="text" name="new_sub_category" class="form-control new-sub-category-field" placeholder="New Sub Category">
                             </div>
                             <div class="form-group">
-                                <input type="text" name="amount" class="form-control amount-field" placeholder="Amount">
+                                <input type="text" name="amount" class="form-control amount-field" placeholder="Amount" required>
                             </div>
                             <div class="form-group">
                                 <input type="date" name="date" class=" form-control date-field" required>
@@ -54,23 +54,16 @@
                         <a data-toggle="collapse" href="#stats-body">Stats</a>
                     </h4>
                 </div>
-                <div id="stats-body" class="panel-collapse collapse">
-                    <table class="table table-bordered savingstrackers-table">
-                        <thead>
-                            <tr>
-                                <th colspan="4" id="totalSavings"></th>
-                            </tr>
-                            <tr>
-                                <th colspan="2">Savings</th>
-                                <th colspan="2">Lent</th>
-                            </tr>
-                        </thead>
-                        <tbody id="stats-table-body">
-                          <tr>
-                          </tr>
-                        </tbody>
-                    </table>
+                <div class="row stats-table" id="stats-body">
+                    <div class="row heading">
+                        <div class="col-xs-6">Savings</div>
+                        <div class="col-xs-6">Lent</div>
+                    </div>
                 </div>
+                
+
+
+                
             </div>
         </div>
         <form id="update-savingstracker-form" class="update-savingstracker-form hide">
@@ -89,7 +82,7 @@
                     <input type="text" name="new_sub_category" class="form-control new-sub-category-field" placeholder="New Sub Category">
                 </div>
                 <div class="form-group">
-                    <input type="text" name="amount" class="form-control amount-field" placeholder="Amount">
+                    <input type="text" name="amount" class="form-control amount-field" placeholder="Amount" required>
                 </div>
                 <div class="form-group">
                     <input type="date" name="date" class=" form-control date-field" required>
