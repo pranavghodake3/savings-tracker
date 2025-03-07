@@ -54,15 +54,27 @@
                         <a data-toggle="collapse" href="#stats-body">Stats</a>
                     </h4>
                 </div>
-                <div class="row stats-table" id="stats-body">
+                <!-- <div class="row stats-table" id="stats-body">
                     <div class="row heading">
                         <div class="col-xs-6">Savings</div>
                         <div class="col-xs-6">Lent</div>
                     </div>
-                </div>
-                
-
-
+                </div> -->
+                <table class="table table-bordered stats-table">
+                    <colgroup>
+                        <col style="width: 25%;">
+                        <col style="width: 25%;">
+                        <col style="width: 25%;">
+                        <col style="width: 25%;">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th colspan="2">Savings</th>
+                            <th colspan="2">Lent</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stats-tbody"></tbody>
+                </table>
                 
             </div>
         </div>

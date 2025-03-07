@@ -373,26 +373,44 @@ function calculateTotal() {
     const savingEntries = Object.entries(savings.savings);
     const lentEntries = Object.entries(savings.lent);
     const maxLoop = Math.max(savingEntries.length, lentEntries.length);
-    const statsTbl = document.getElementById("stats-body");
+    const statsTbody = document.getElementById("stats-tbody");
     let rowDiv = document.createElement("div");
     for (let i = 0; i < maxLoop; i++) {
-        rowDiv = document.createElement("div");
-        rowDiv.classList.add("row");
-        rowDiv.innerHTML = `
-            <div class="col-xs-3">${savingEntries[i] ? savingEntries[i][0] : '&nbsp;'}</div>
-            <div class="col-xs-3">${savingEntries[i] ? '&#8377; '+savingEntries[i][1] : '&nbsp;'.toLocaleString()}</div>
-            <div class="col-xs-3">${lentEntries[i] ? lentEntries[i][0] : '&nbsp;'}</div>
-            <div class="col-xs-3">${lentEntries[i] ? '&#8377; '+lentEntries[i][1] : '&nbsp;'.toLocaleString()}</div>
-        `;
-        statsTbl.append(rowDiv);
+        row = statsTbody.insertRow();
+        row.classList.add('stats-row');
+        cell_l = row.insertCell(0);
+        cell_2 = row.insertCell(1);
+        cell_3 = row.insertCell(2);
+        cell_4 = row.insertCell(3);
+
+        cell_l.innerHTML = `${savingEntries[i] ? savingEntries[i][0] : '&nbsp;'}`;
+        cell_2.innerHTML = `${savingEntries[i] ? '&#8377; '+savingEntries[i][1].toLocaleString() : '&nbsp;'}`;
+        cell_3.innerHTML = `${lentEntries[i] ? lentEntries[i][0] : '&nbsp;'}`;
+        cell_4.innerHTML = `${lentEntries[i] ? '&#8377; '+lentEntries[i][1].toLocaleString() : '&nbsp;'}`;
+
+        // rowDiv = document.createElement("div");
+        // rowDiv.classList.add("row");
+        // rowDiv.innerHTML = `
+        //     <div class="col-xs-3">${savingEntries[i] ? savingEntries[i][0] : '&nbsp;'}</div>
+        //     <div class="col-xs-3">${savingEntries[i] ? '&#8377; '+savingEntries[i][1].toLocaleString() : '&nbsp;'}</div>
+        //     <div class="col-xs-3">${lentEntries[i] ? lentEntries[i][0] : '&nbsp;'}</div>
+        //     <div class="col-xs-3">${lentEntries[i] ? '&#8377; '+lentEntries[i][1].toLocaleString() : '&nbsp;'}</div>
+        // `;
+        // statsTbl.append(rowDiv);
     }
-    rowDiv = document.createElement("div");
-    rowDiv.classList.add("row");
-    rowDiv.classList.add("total-savings");
-    rowDiv.innerHTML = `
-        <div class="col-xs-12">Total Savings: <b>&#8377;  ${savings.totalAmount.toLocaleString()}</b></div>
-    `;
-    statsTbl.append(rowDiv);
+    row = statsTbody.insertRow();
+    row.classList.add('total-savings');
+    cell_l = row.insertCell(0);
+    cell_l.colSpan = 4;
+    cell_l.innerHTML = `Total Savings: <b>&#8377;  ${savings.totalAmount.toLocaleString()}</b>`;
+
+    // rowDiv = document.createElement("div");
+    // rowDiv.classList.add("row");
+    // rowDiv.classList.add("total-savings");
+    // rowDiv.innerHTML = `
+    //     <div class="col-xs-12">Total Savings: <b>&#8377;  ${savings.totalAmount.toLocaleString()}</b></div>
+    // `;
+    // statsTbl.append(rowDiv);
 }
 
 window.onload = async function(){

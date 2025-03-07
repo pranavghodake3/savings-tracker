@@ -121,3 +121,10 @@ form{
 .row.total-savings{
     font-size: 20px;
 }
+.stats-table thead th{
+    text-align: center;
+}
+.total-savings td{
+    text-align: center;
+    font-size: 25px;;
+}
