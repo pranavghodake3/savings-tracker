@@ -319,7 +319,7 @@ async function loadTransactions(){
                     <input type="hidden" name="savingstracker-field" class="savingstracker-field" value='${JSON.stringify(transactions[i])}'>
                 `;
                 cell_l.addEventListener("click", editTransaction);
-                cell_2.innerHTML = `&#8377;  ${transactions[i].amount.toLocaleString()}`;
+                cell_2.innerHTML = `&#8377;  ${transactions[i].amount.toLocaleString("en-IN")}`;
                 cell_3.innerHTML = `${formatDate(transactions[i].date)}`;
                 cell_4.innerHTML = `
                     <input type="hidden" name="id" class="id-field" value="${transactions[i]._id}">
@@ -364,7 +364,8 @@ function calculateTotal() {
         savings.lent[arrangedCategoriesById[e.subCategoryId]] -= e.amount;
         savings.totalAmount -= e.amount;
       }
-      if (arrangedCategoriesById[e.categoryId].name == "Kharch") {
+      if (["Kharch", "Withdraw"].includes(arrangedCategoriesById[e.categoryId].name)) {
+        if (typeof savings.savings[arrangedCategoriesById[e.subCategoryId].name] == 'undefined') savings.savings[arrangedCategoriesById[e.subCategoryId].name] = 0;
         savings.savings[arrangedCategoriesById[e.subCategoryId].name] -= e.amount;
         savings.kharch += e.amount;
         savings.totalAmount -= e.amount;
@@ -374,6 +375,7 @@ function calculateTotal() {
     const lentEntries = Object.entries(savings.lent);
     const maxLoop = Math.max(savingEntries.length, lentEntries.length);
     const statsTbody = document.getElementById("stats-tbody");
+    statsTbody.innerHTML = '';
     let rowDiv = document.createElement("div");
     for (let i = 0; i < maxLoop; i++) {
         row = statsTbody.insertRow();
@@ -382,35 +384,16 @@ function calculateTotal() {
         cell_2 = row.insertCell(1);
         cell_3 = row.insertCell(2);
         cell_4 = row.insertCell(3);
-
         cell_l.innerHTML = `${savingEntries[i] ? savingEntries[i][0] : '&nbsp;'}`;
-        cell_2.innerHTML = `${savingEntries[i] ? '&#8377; '+savingEntries[i][1].toLocaleString() : '&nbsp;'}`;
+        cell_2.innerHTML = `${savingEntries[i] ? '&#8377; '+savingEntries[i][1].toLocaleString("en-IN") : '&nbsp;'}`;
         cell_3.innerHTML = `${lentEntries[i] ? lentEntries[i][0] : '&nbsp;'}`;
-        cell_4.innerHTML = `${lentEntries[i] ? '&#8377; '+lentEntries[i][1].toLocaleString() : '&nbsp;'}`;
-
-        // rowDiv = document.createElement("div");
-        // rowDiv.classList.add("row");
-        // rowDiv.innerHTML = `
-        //     <div class="col-xs-3">${savingEntries[i] ? savingEntries[i][0] : '&nbsp;'}</div>
-        //     <div class="col-xs-3">${savingEntries[i] ? '&#8377; '+savingEntries[i][1].toLocaleString() : '&nbsp;'}</div>
-        //     <div class="col-xs-3">${lentEntries[i] ? lentEntries[i][0] : '&nbsp;'}</div>
-        //     <div class="col-xs-3">${lentEntries[i] ? '&#8377; '+lentEntries[i][1].toLocaleString() : '&nbsp;'}</div>
-        // `;
-        // statsTbl.append(rowDiv);
+        cell_4.innerHTML = `${lentEntries[i] ? '&#8377; '+lentEntries[i][1].toLocaleString("en-IN") : '&nbsp;'}`;
     }
     row = statsTbody.insertRow();
     row.classList.add('total-savings');
     cell_l = row.insertCell(0);
     cell_l.colSpan = 4;
-    cell_l.innerHTML = `Total Savings: <b>&#8377;  ${savings.totalAmount.toLocaleString()}</b>`;
-
-    // rowDiv = document.createElement("div");
-    // rowDiv.classList.add("row");
-    // rowDiv.classList.add("total-savings");
-    // rowDiv.innerHTML = `
-    //     <div class="col-xs-12">Total Savings: <b>&#8377;  ${savings.totalAmount.toLocaleString()}</b></div>
-    // `;
-    // statsTbl.append(rowDiv);
+    cell_l.innerHTML = `Total Savings: <b>&#8377;  ${savings.totalAmount.toLocaleString("en-IN")}</b>`;
 }
 
 window.onload = async function(){

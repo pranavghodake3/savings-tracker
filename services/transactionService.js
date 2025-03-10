@@ -2,7 +2,7 @@ const transactionModel = require("../models/transactionModel");
 const categoryService = require("../services/categoryService");
 
 const gettransactions = async() => {
-    const transactions = await transactionModel.find();
+    const transactions = await transactionModel.find().sort({date: -1});
 
     return {
         transactions,
