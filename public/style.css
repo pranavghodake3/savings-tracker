@@ -128,3 +128,9 @@ form{
     text-align: center;
     font-size: 25px;;
 }
+.total-savings-lent{
+    font-size: 20px;
+}
+.total-savings-title{
+    text-align: right;
+}

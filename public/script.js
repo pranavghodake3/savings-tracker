@@ -347,6 +347,8 @@ function calculateTotal() {
       savings: {},
       lent: {},
       kharch: 0,
+      totalSavings: 0,
+      totalOnLent: 0,
       totalAmount: 0,
     };
     transactions.forEach(e => {
@@ -354,21 +356,25 @@ function calculateTotal() {
         if (typeof savings.savings[arrangedCategoriesById[e.subCategoryId].name] == 'undefined') savings.savings[arrangedCategoriesById[e.subCategoryId].name] = 0;
         savings.savings[arrangedCategoriesById[e.subCategoryId].name] += e.amount;
         savings.totalAmount += e.amount;
+        savings.totalSavings += e.amount;
       }
       if (arrangedCategoriesById[e.categoryId].name == "Lent") {
         if (typeof savings.lent[arrangedCategoriesById[e.subCategoryId].name] == 'undefined') savings.lent[arrangedCategoriesById[e.subCategoryId].name] = 0;
         savings.lent[arrangedCategoriesById[e.subCategoryId].name] += e.amount;
         savings.totalAmount += e.amount;
+        savings.totalOnLent += e.amount;
       }
       if (arrangedCategoriesById[e.categoryId].name == "Lent Received") {
         savings.lent[arrangedCategoriesById[e.subCategoryId]] -= e.amount;
         savings.totalAmount -= e.amount;
+        savings.totalOnLent -= e.amount;
       }
       if (["Kharch", "Withdraw"].includes(arrangedCategoriesById[e.categoryId].name)) {
         if (typeof savings.savings[arrangedCategoriesById[e.subCategoryId].name] == 'undefined') savings.savings[arrangedCategoriesById[e.subCategoryId].name] = 0;
         savings.savings[arrangedCategoriesById[e.subCategoryId].name] -= e.amount;
         savings.kharch += e.amount;
         savings.totalAmount -= e.amount;
+        savings.totalSavings -= e.amount;
       }
     });
     const savingEntries = Object.entries(savings.savings);
@@ -390,10 +396,24 @@ function calculateTotal() {
         cell_4.innerHTML = `${lentEntries[i] ? '&#8377; '+lentEntries[i][1].toLocaleString("en-IN") : '&nbsp;'}`;
     }
     row = statsTbody.insertRow();
+    row.classList.add('total-savings-lent');
+    cell_1 = row.insertCell(0);
+    cell_2 = row.insertCell(1);
+    cell_3 = row.insertCell(2);
+    cell_4 = row.insertCell(3);
+    cell_1.classList.add('total-savings-title');
+    cell_1.innerHTML = `Total:`;
+    cell_2.innerHTML = `<b>&#8377;  ${savings.totalSavings.toLocaleString("en-IN")}</b>`;
+    
+    cell_3.classList.add('total-savings-title');
+    cell_3.innerHTML = `Total`;
+    cell_4.innerHTML = ` <b>&#8377;  ${savings.totalOnLent.toLocaleString("en-IN")}</b>`;
+
+    row = statsTbody.insertRow();
     row.classList.add('total-savings');
     cell_l = row.insertCell(0);
     cell_l.colSpan = 4;
-    cell_l.innerHTML = `Total Savings: <b>&#8377;  ${savings.totalAmount.toLocaleString("en-IN")}</b>`;
+    cell_l.innerHTML = `<b>&#8377;  ${savings.totalAmount.toLocaleString("en-IN")}</b>`;
 }
 
 window.onload = async function(){
