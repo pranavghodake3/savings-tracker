@@ -3,7 +3,7 @@ const app = express();
 const categoryRoute = require("./routes/category");
 const homeRoute = require("./routes/homeRoute");
 const transactionRoute = require("./routes/transaction");
-const { addModule, addCRUDModule } = require("./services/addModuleService");
+const { addCRUDModule } = require("./crud/addModuleService");
 const connectDB = require("./config/db");
 require("dotenv").config();
 connectDB();
@@ -17,7 +17,6 @@ app.use(express.static('public'));
 app.get('/', homeRoute);
 app.use("/categories", categoryRoute);
 app.use("/transactions", transactionRoute);
-app.get("/add-module/:moduleName", addModule);
 app.get("/add-crud-module/:crudModuleName", addCRUDModule);
 
 app.listen(process.env.PORT, () => {
