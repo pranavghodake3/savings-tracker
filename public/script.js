@@ -98,13 +98,13 @@ async function loadCategories(){
     });
 }
 function loadSubCategories(current){
+    const isChecked = $('.new-sub-category-checkbox').prop('checked');
+    if(isChecked)   $(".new-sub-category-checkbox").trigger('click');
     $(".from-drop-down").addClass("hide");
     if(current.value && arrangedCategoriesById[current.value].slug == 'lent-received'){
+        console.log("arrangedCategoriesById[current.value].slug: ",arrangedCategoriesById[current.value].slug)
         $(".from-drop-down").removeClass("hide");
     }
-    console.log("mainCat: ",mainCategories)
-    console.log("savingCat: ",savingsKharchCategories)
-    console.log("lentCat: ",lentReceivedCategories)
     let selectedText = current.options[current.selectedIndex].text;
     if(current.value && arrangedCategoriesById[current.value].slug == 'savings-kharch' && selectedText == 'Savings'){
         loadRelatedSubCategories('To', savingsKharchCategories, 'primarySubCategoryId');
@@ -118,7 +118,9 @@ function loadSubCategories(current){
         $(".new-sub-category-check").addClass("hide");
     }else if(current.value && arrangedCategoriesById[current.value].slug == 'savings-kharch' && selectedText == 'Kharch'){
         loadRelatedSubCategories('From', savingsKharchCategories, 'primarySubCategoryId');
-        $(".new-sub-category-check").removeClass("hide");
+        $(".new-sub-category-check").addClass("hide");
+        $(".from-drop-down").removeClass("hide");
+        $(".secondary-sub-category-form-group").addClass("hide");
     }
 }
 function loadRelatedSubCategories(selectText, loadingCats, selectDropDownId){
@@ -490,6 +492,7 @@ function calculateTotal() {
     cell_l.innerHTML = `<b>&#8377;  ${savings.totalAmount.toLocaleString("en-IN")}</b>`;
 }
 $('.new-sub-category-checkbox').on('click', function() {
+    console.log("Triggered")
     $(this).closest("form").find("input[name='newSubCategory']").val("");
     $(this).closest("form").find("select.sub-category-field").val("");
     if ($(this).is(":checked")) {

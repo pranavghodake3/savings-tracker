@@ -19,16 +19,30 @@ const gettransaction = async(id) => {
 };
 
 const create = async(body) => {
-    const { date, categoryId, categoryName, categorySlug, newSubCategory, primarySubCategoryId, secondarySubCategoryId, amount } = body;
-    // let finalSubCategoryId = subCategoryId;
+    const { date, categoryId, categoryName, categorySlug, new_sub_category_check, newSubCategory, primarySubCategoryId, secondarySubCategoryId, amount } = body;
+    let finalSubCategoryId = primarySubCategoryId;
     let transactionModelObj;
     let data = [];
     let transaction;
+    if (typeof new_sub_category_check != 'undefined' && newSubCategory) {
+        const existingSubCategory = await Category.findOne({name: newSubCategory});
+        if(!existingSubCategory){
+            const newSubCategoryCreated = await categoryService.create({
+                name: newSubCategory,
+                main: false,
+                slug: categorySlug,
+            });
+            finalSubCategoryId = newSubCategoryCreated._id;
+        }else{
+            finalSubCategoryId = existingSubCategory._id;
+        }
+    }
+
     if(categoryName == 'Savings'){
         const transactionModelObj = new transactionModel({
             date,
             categoryId,
-            subCategoryId: primarySubCategoryId,
+            subCategoryId: finalSubCategoryId,
             amount,
         });
         transaction = await transactionModelObj.save();
@@ -46,7 +60,7 @@ const create = async(body) => {
         transactionModelObj = new transactionModel({
             date,
             categoryId,
-            subCategoryId: primarySubCategoryId,
+            subCategoryId: finalSubCategoryId,
             amount,
         });
         transaction = await transactionModelObj.save();
@@ -56,7 +70,7 @@ const create = async(body) => {
         transactionModelObj = new transactionModel({
             date,
             categoryId,
-            subCategoryId: primarySubCategoryId,
+            subCategoryId: finalSubCategoryId,
             amount,
         });
         transaction = await transactionModelObj.save();
@@ -70,22 +84,6 @@ const create = async(body) => {
         transaction = await transactionModelObj.save();
         data.push(transaction);
     }
-    // if (newSubCategory) {
-    //     const newSubCategoryCreated = await categoryService.create({
-    //         name: newSubCategory,
-    //         main: false,
-    //         slug: categorySlug,
-    //     });
-    //     finalSubCategoryId = newSubCategoryCreated._id;
-    // }
-
-    // const transactionModelObj = new transactionModel({
-    //     date,
-    //     categoryId,
-    //     subCategoryId: finalSubCategoryId,
-    //     amount,
-    // });
-    // const data = await transactionModelObj.save();
 
     return data;
 };
