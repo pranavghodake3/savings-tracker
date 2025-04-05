@@ -22,7 +22,8 @@ const create = async(body) => {
     const { date, categoryId, categoryName, categorySlug, newSubCategory, primarySubCategoryId, secondarySubCategoryId, amount } = body;
     // let finalSubCategoryId = subCategoryId;
     let transactionModelObj;
-    let data;
+    let data = [];
+    let transaction;
     if(categoryName == 'Savings'){
         const transactionModelObj = new transactionModel({
             date,
@@ -30,7 +31,8 @@ const create = async(body) => {
             subCategoryId: primarySubCategoryId,
             amount,
         });
-        const data = await transactionModelObj.save();
+        transaction = await transactionModelObj.save();
+        data.push(transaction);
     }else if(categoryName == 'Lent'){
         const withdrawCategory =  await Category.findOne({name: 'Withdraw'});
         transactionModelObj = new transactionModel({
@@ -39,14 +41,16 @@ const create = async(body) => {
             subCategoryId: secondarySubCategoryId,
             amount,
         });
-        data = await transactionModelObj.save();
+        transaction = await transactionModelObj.save();
+        data.push(transaction);
         transactionModelObj = new transactionModel({
             date,
             categoryId,
             subCategoryId: primarySubCategoryId,
             amount,
         });
-        data = await transactionModelObj.save();
+        transaction = await transactionModelObj.save();
+        data.push(transaction);
     }else if(categoryName == 'Lent Received'){
         const savingsCategory =  await Category.findOne({name: 'Savings'});
         transactionModelObj = new transactionModel({
@@ -55,14 +59,16 @@ const create = async(body) => {
             subCategoryId: primarySubCategoryId,
             amount,
         });
-        data = await transactionModelObj.save();
+        transaction = await transactionModelObj.save();
+        data.push(transaction);
         transactionModelObj = new transactionModel({
             date,
             categoryId: savingsCategory._id,
             subCategoryId: secondarySubCategoryId,
             amount,
         });
-        data = await transactionModelObj.save();
+        transaction = await transactionModelObj.save();
+        data.push(transaction);
     }
     // if (newSubCategory) {
     //     const newSubCategoryCreated = await categoryService.create({

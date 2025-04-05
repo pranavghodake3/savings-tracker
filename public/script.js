@@ -97,10 +97,7 @@ async function loadCategories(){
         });
     });
 }
-function loadSubCategories(current = null, compareMainCategorySlug = null){
-    if(current.value){
-
-    }
+function loadSubCategories(current){
     $(".from-drop-down").addClass("hide");
     if(current.value && arrangedCategoriesById[current.value].slug == 'lent-received'){
         $(".from-drop-down").removeClass("hide");
@@ -132,14 +129,6 @@ function loadRelatedSubCategories(selectText, loadingCats, selectDropDownId){
         $(select).append(`<option value="${cat._id}">${cat.name}</option>`);
     });
 }
-// function loadSecondary(selectText, loadingCats){
-//     const select = $("#add-savingstracker-form").find("select[name='secondarySubCategoryId']");
-//     $(select).html('');
-//     $(select).append(`<option value="">Select ${selectText}</option>`);
-//     loadingCats.forEach(cat => {
-//         $(select).append(`<option value="${cat._id}">${cat.name}</option>`);
-//     });
-// }
 function loadSubCategoriesOld(current = null, compareMainCategorySlug = null){
     compareMainCategorySlug = compareMainCategorySlug ? compareMainCategorySlug : arrangedCategoriesById[current.value].slug;
     $(".from-drop-down").addClass("hide");
@@ -259,13 +248,21 @@ function editTransaction() {
     savingstrackerData = JSON.parse(savingstrackerData);
     const form = document.getElementById("update-savingstracker-form");
     form.querySelector('.category-field').value = savingstrackerData.categoryId;
-    loadSubCategories(null, arrangedCategoriesById[savingstrackerData.categoryId].slug);
+    loadSubCategoriesToUpdate(arrangedCategoriesById[savingstrackerData.categoryId].slug);
     form.querySelector('.sub-category-field').value = savingstrackerData.subCategoryId;
     form.querySelector('.amount-field').value = savingstrackerData.amount;
     form.querySelector('.date-field').value = new Date(savingstrackerData.date).toISOString().split('T')[0];
     form.querySelector('.savingstracker-id-field').value = savingstrackerData._id;
-    form.classList.remove("hide");
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    $("#updateTransactionModal").modal("show");
+}
+function loadSubCategoriesToUpdate(mainCategorySlug) {
+    const select = $("#update-savingstracker-form").find(`select[name='subCategoryId']`);
+    $(select).html('');
+    $(select).append(`<option value="">Select Subcategory</option>`);
+    const loadingCats = mainCategorySlug == 'savings-kharch' ? savingsKharchCategories : lentReceivedCategories;
+    loadingCats.forEach(cat => {
+        $(select).append(`<option value="${cat._id}">${cat.name}</option>`);
+    });
 }
 document.getElementById("add-savingstracker-form").addEventListener("submit", async function(event) {
     event.preventDefault();
@@ -300,7 +297,6 @@ document.getElementById("add-savingstracker-form").addEventListener("submit", as
         $("#addTransactionModal").modal("hide");
         if(formSubmitData.status){
             await showStatusMessage("Added Successfully!", 'true', [loadCategories, loadTransactions]);
-            document.getElementById("add-savingstracker-collaps-btn").click();
             form.reset();
             form.querySelector('.date-field').value = new Date().toISOString().split('T')[0];
         }else{
