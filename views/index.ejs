@@ -8,18 +8,125 @@
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-    <div class="container">
-        <div class="alert alert-success hide"></div>
-        <div class="alert alert-danger hide"></div>
-        <div class="panel-group savingstracker-stats">
-            <div class="panel panel-default">
-                <div class="panel-heading add-savingstracker-title">
-                    <h4 class="panel-title">
-                        <a data-toggle="collapse" id="add-savingstracker-collaps-btn" href="#collapse1">Add Transaction</a>
-                    </h4>
+<div class="container">
+    <div class="alert alert-success hide"></div>
+    <div class="alert alert-danger hide"></div>
+    <div class="panel-group savingstracker-stats">
+        <div class="panel panel-default">
+            <div class="panel-heading add-savingstracker-title">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <button type="button" class="btn btn-info btn-xs" id="add-transaction-btn" data-toggle="modal" data-target="#addTransactionModal">Add Transaction</button>
+                    </div>
+                    <div class="col-xs-6">
+                        <a data-toggle="collapse" class="btn btn-primary btn-xs show-panel" butn-name="categories" href="#categories-body">Categories</a>
+                    </div>
                 </div>
-                <div id="collapse1" class="panel-collapse collapse">
-                    <form id="add-savingstracker-form">
+            </div>
+        </div>
+    </div>
+    <div class="panel-group expense-stats">
+        <div class="panel panel-default">
+            <div class="panel-heading stats-title">
+                <h4 class="panel-title">
+                    <a data-toggle="collapse" href="#stats-body">Stats</a>
+                </h4>
+            </div>
+            <!-- <div class="row stats-table" id="stats-body">
+                <div class="row heading">
+                    <div class="col-xs-6">Savings</div>
+                    <div class="col-xs-6">Lent</div>
+                </div>
+            </div> -->
+            <table class="table table-bordered stats-table">
+                <colgroup>
+                    <col style="width: 25%;">
+                    <col style="width: 25%;">
+                    <col style="width: 25%;">
+                    <col style="width: 25%;">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th colspan="2">Savings</th>
+                        <th colspan="2">Lent</th>
+                    </tr>
+                </thead>
+                <tbody id="stats-tbody"></tbody>
+            </table>
+            
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group">
+            <input type="text" name="search" id="search" placeholder="Search" onkeyup="searchTable()">
+            <button type="button" onclick="document.getElementById('search').value = '';searchTable();">Clear</button>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-bordered savingstrackers-table">
+            <tbody id="savingstrackers"></tbody>
+        </table>
+    </div>
+
+    <!-- Add Transaction Modal -->
+    <div id="addTransactionModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Add Transaction</h4>
+            </div>
+            <div class="modal-body">
+                <form id="add-savingstracker-form">
+                    <div id="fieldsContainer">
+                        <div class="form-group">
+                            <select name="categoryId" class="form-control category-field" onchange="loadSubCategories(this)" required>
+                                <option value="">Select Category</option>
+                            </select>
+                        </div>
+                        <div class="form-group new-sub-category-check">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" name="new_site_check" class="new-sub-category-checkbox">New Sub Category
+                            </label>
+                        </div>
+                        <div class="form-group new-sub-category-form-group hide">
+                            <input type="text" name="newSubCategory" class="form-control new-sub-category-field" placeholder="New Sub Category">
+                        </div>
+                        <div class="form-group existing-sub-category-form-group">
+                            <select name="primarySubCategoryId" class="form-control sub-category-field" select-text="primary">
+                                <option value="">Select Sub Category</option>
+                            </select>
+                        </div>
+                        <div class="form-group from-drop-down hide">
+                            <select name="secondarySubCategoryId" class="form-control sub-category-field" select-text="secondary">
+                                <option value="">Select From</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" name="amount" class="form-control amount-field" placeholder="Amount" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="date" name="date" class=" form-control date-field" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="submit-btn">Submit</button>
+                    <button type="button" class="btn btn-default" onclick="onCancelClick(this);">Cancel</button>
+                </form>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Transaction Modal -->
+    <div id="updateTransactionModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Update Transaction</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="update-savingstracker-form" class="update-savingstracker-form hide">
                         <div id="fieldsContainer">
                             <div class="form-group">
                                 <select name="categoryId" class="form-control category-field" onchange="loadSubCategories(this)" required>
@@ -28,11 +135,11 @@
                             </div>
                             <div class="form-group">
                                 <select name="subCategoryId" class="form-control sub-category-field">
-                                    <option value="">Select Sub Category</option>
+                                    <option value="">Select Subcategory</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <input type="text" name="new_sub_category" class="form-control new-sub-category-field" placeholder="New Sub Category">
+                                <input type="text" name="newSubCategory" class="form-control new-sub-category-field" placeholder="New Sub Category">
                             </div>
                             <div class="form-group">
                                 <input type="text" name="amount" class="form-control amount-field" placeholder="Amount" required>
@@ -40,85 +147,20 @@
                             <div class="form-group">
                                 <input type="date" name="date" class=" form-control date-field" required>
                             </div>
+                            <input type="hidden" name="savingstracker_id" class="savingstracker-id-field">
                         </div>
-                        <button type="submit" class="btn btn-primary" id="submit-btn">Submit</button>
-                        <button type="button" class="btn btn-default" onclick="onCancelClick(this);">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="update-btn">Update</button>
+                        <button type="button" class="btn btn-default" onclick="cancelUpdateTransaction(this);">Cancel</button>
                     </form>
                 </div>
             </div>
         </div>
-        <div class="panel-group expense-stats">
-            <div class="panel panel-default">
-                <div class="panel-heading stats-title">
-                    <h4 class="panel-title">
-                        <a data-toggle="collapse" href="#stats-body">Stats</a>
-                    </h4>
-                </div>
-                <!-- <div class="row stats-table" id="stats-body">
-                    <div class="row heading">
-                        <div class="col-xs-6">Savings</div>
-                        <div class="col-xs-6">Lent</div>
-                    </div>
-                </div> -->
-                <table class="table table-bordered stats-table">
-                    <colgroup>
-                        <col style="width: 25%;">
-                        <col style="width: 25%;">
-                        <col style="width: 25%;">
-                        <col style="width: 25%;">
-                    </colgroup>
-                    <thead>
-                        <tr>
-                            <th colspan="2">Savings</th>
-                            <th colspan="2">Lent</th>
-                        </tr>
-                    </thead>
-                    <tbody id="stats-tbody"></tbody>
-                </table>
-                
-            </div>
-        </div>
-        <form id="update-savingstracker-form" class="update-savingstracker-form hide">
-            <div id="fieldsContainer">
-                <div class="form-group">
-                    <select name="categoryId" class="form-control category-field" onchange="loadSubCategories(this)" required>
-                        <option value="">Select Category</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <select name="subCategoryId" class="form-control sub-category-field">
-                        <option value="">Select Subcategory</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <input type="text" name="new_sub_category" class="form-control new-sub-category-field" placeholder="New Sub Category">
-                </div>
-                <div class="form-group">
-                    <input type="text" name="amount" class="form-control amount-field" placeholder="Amount" required>
-                </div>
-                <div class="form-group">
-                    <input type="date" name="date" class=" form-control date-field" required>
-                </div>
-                <input type="hidden" name="savingstracker_id" class="savingstracker-id-field">
-            </div>
-            <button type="submit" class="btn btn-primary" id="update-btn">Update</button>
-            <button type="button" class="btn btn-default" onclick="cancelUpdateTransaction(this);">Cancel</button>
-        </form>
-        <div class="row">
-            <div class="form-group">
-                <input type="text" name="search" id="search" placeholder="Search" onkeyup="searchTable()">
-                <button type="button" onclick="document.getElementById('search').value = '';searchTable();">Clear</button>
-            </div>
-        </div>
-        <div class="table-responsive">
-            <table class="table table-bordered savingstrackers-table">
-                <tbody id="savingstrackers"></tbody>
-            </table>
-        </div>
     </div>
 
-    <script src="./script.js"></script>
-    <script src="/node_modules/jquery/dist/jquery.min.js"></script>
-    <script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+</div><!-- end of container div -->
+
+<script src="/node_modules/jquery/dist/jquery.min.js"></script>
+<script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="./script.js"></script>
 </body>
 </html>

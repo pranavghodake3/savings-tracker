@@ -2,6 +2,9 @@ const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 let categories = [];
 let arrangedCategoriesById = {};
 let transactions = [];
+let mainCategories = [];
+let savingsKharchCategories = [];
+let lentReceivedCategories = [];
 document.querySelectorAll(".date-field").forEach(input => {
     input.value = new Date().toISOString().split('T')[0];
 });
@@ -9,42 +12,7 @@ function cancelUpdateTransaction(){
     document.getElementById("update-savingstracker-form").classList.add("hide");
     document.getElementById("update-savingstracker-form").reset();
 }
-document.getElementById("add-savingstracker-form").addEventListener("submit", async function(event) {
-    event.preventDefault();
-    const submitButton = document.getElementById("submit-btn");
-    submitButton.disabled = true;
-    submitButton.textContent = "Submitting...";
-    const form = document.getElementById("add-savingstracker-form");
-    const categoryId = form.querySelector('.category-field').value;
-    const subCategoryId = form.querySelector('.sub-category-field').value;
-    const newSubCategory = form.querySelector('.new-sub-category-field').value;
-    const amount = form.querySelector('.amount-field').value;
-    const date = form.querySelector('.date-field').value;
-    if(subCategoryId || newSubCategory){
-        let formSubmitData = await fetch("/transactions", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({categoryId, subCategoryId, newSubCategory, amount, date, mainCategorySlug: arrangedCategoriesById[categoryId].slug}),
-        });
-        formSubmitData = await formSubmitData.json();
-        if(formSubmitData.status){
-            await loadCategories();
-            await showStatusMessage("Added Successfully!", 'true', loadTransactions);
-            document.getElementById("add-savingstracker-collaps-btn").click();
-            form.reset();
-            form.querySelector('.date-field').value = new Date().toISOString().split('T')[0];
-        }else{
-            await showStatusMessage(formSubmitData.error, 'false');
-        }
-    }else{
-        await showStatusMessage("Select sub category or enter new one", 'false');
-    }
-    submitButton.disabled = false;
-    submitButton.textContent = "Submit";
-});
-async function showStatusMessage(formStatusMessage, formStatus, fun = null){
+async function showStatusMessage(formStatusMessage, formStatus, funArr = []){
     const formStatusElement = document.getElementsByClassName(formStatus == 'true' ? 'alert-success' : 'alert-danger')[0];
     formStatusElement.classList.remove('hide');
     if(formStatusMessage){
@@ -53,7 +21,11 @@ async function showStatusMessage(formStatusMessage, formStatus, fun = null){
         formStatusElement.classList.add(formStatus);
         setTimeout(() => {
             formStatusElement.classList.add('hide');
-            if(fun) fun();
+            if(funArr.length > 0){
+                for (let i = 0; i < funArr.length; i++) {
+                    funArr[i]();
+                }
+            }
         }, formStatus === "true" ? 1000 : 3000);
     }
 }
@@ -103,6 +75,11 @@ async function loadCategories(){
     let response = await fetch('/categories');
     response = await response.json();
     categories = response.data.categories;
+    response.data.categories.forEach(category => {
+        if(category.main)   mainCategories.push(category);
+        if(category.slug == 'savings-kharch' && !category.main)   savingsKharchCategories.push(category);
+        if(category.slug == 'lent-received' && !category.main)   lentReceivedCategories.push(category);
+    });
     document.querySelectorAll(".category-field").forEach(select => {
         select.innerHTML = '';
         option = document.createElement("option");
@@ -121,12 +98,83 @@ async function loadCategories(){
     });
 }
 function loadSubCategories(current = null, compareMainCategorySlug = null){
+    if(current.value){
+
+    }
+    $(".from-drop-down").addClass("hide");
+    if(current.value && arrangedCategoriesById[current.value].slug == 'lent-received'){
+        $(".from-drop-down").removeClass("hide");
+    }
+    console.log("mainCat: ",mainCategories)
+    console.log("savingCat: ",savingsKharchCategories)
+    console.log("lentCat: ",lentReceivedCategories)
+    let selectedText = current.options[current.selectedIndex].text;
+    if(current.value && arrangedCategoriesById[current.value].slug == 'savings-kharch' && selectedText == 'Savings'){
+        loadRelatedSubCategories('To', savingsKharchCategories, 'primarySubCategoryId');
+        $(".new-sub-category-check").removeClass("hide");
+    }else if(current.value && arrangedCategoriesById[current.value].slug == 'lent-received' && selectedText == 'Lent'){
+        loadRelatedSubCategories('To', lentReceivedCategories, 'primarySubCategoryId');
+        loadRelatedSubCategories('From', savingsKharchCategories, 'secondarySubCategoryId');
+    }else if(current.value && arrangedCategoriesById[current.value].slug == 'lent-received' && selectedText == 'Lent Received'){
+        loadRelatedSubCategories('From', lentReceivedCategories, 'primarySubCategoryId');
+        loadRelatedSubCategories('To', savingsKharchCategories, 'secondarySubCategoryId');
+        $(".new-sub-category-check").addClass("hide");
+    }else if(current.value && arrangedCategoriesById[current.value].slug == 'savings-kharch' && selectedText == 'Kharch'){
+        loadRelatedSubCategories('From', savingsKharchCategories, 'primarySubCategoryId');
+        $(".new-sub-category-check").removeClass("hide");
+    }
+}
+function loadRelatedSubCategories(selectText, loadingCats, selectDropDownId){
+    const select = $("#add-savingstracker-form").find(`select[name='${selectDropDownId}']`);
+    $(select).html('');
+    $(select).append(`<option value="">Select ${selectText}</option>`);
+    loadingCats.forEach(cat => {
+        $(select).append(`<option value="${cat._id}">${cat.name}</option>`);
+    });
+}
+// function loadSecondary(selectText, loadingCats){
+//     const select = $("#add-savingstracker-form").find("select[name='secondarySubCategoryId']");
+//     $(select).html('');
+//     $(select).append(`<option value="">Select ${selectText}</option>`);
+//     loadingCats.forEach(cat => {
+//         $(select).append(`<option value="${cat._id}">${cat.name}</option>`);
+//     });
+// }
+function loadSubCategoriesOld(current = null, compareMainCategorySlug = null){
     compareMainCategorySlug = compareMainCategorySlug ? compareMainCategorySlug : arrangedCategoriesById[current.value].slug;
+    $(".from-drop-down").addClass("hide");
+    if(current.value && arrangedCategoriesById[current.value].slug == 'lent-received'){
+        $(".from-drop-down").removeClass("hide");
+    }
+    console.log("mainCat: ",mainCategories)
+    console.log("savingCat: ",savingsKharchCategories)
+    console.log("lentCat: ",lentReceivedCategories)
     document.querySelectorAll(".sub-category-field").forEach(select => {
         select.innerHTML = '';
         let option = document.createElement("option");
         option.value = '';
-        option.text = 'Select Sub Category';
+        option.text = 'Select ';
+        let selectedText = current.options[current.selectedIndex].text;
+        if(current.value && arrangedCategoriesById[current.value].slug == 'lent-received' && selectedText == 'Lent Received'){
+            $(".new-sub-category-check").addClass("hide");
+            if(select.getAttribute("select-text") == 'primary'){
+                option.text += " From";
+            }else if(select.getAttribute("select-text") == 'secondary'){
+                option.text += " To";
+            }
+        }else if(current.value && arrangedCategoriesById[current.value].slug == 'lent-received' && selectedText == 'Lent'){
+            // $(".new-sub-category-check").addClass("hide");
+            if(select.getAttribute("select-text") == 'primary'){
+                option.text += " To";
+            }else if(select.getAttribute("select-text") == 'secondary'){
+                option.text += " From";
+            }
+        }else{
+            if(select.getAttribute("select-text") == 'primary'){
+                option.text += " To";
+            }
+            $(".new-sub-category-check").removeClass("hide");
+        }
         select.appendChild(option);
         categories.forEach(category => {
             if(!category.main && category.slug == compareMainCategorySlug){
@@ -135,23 +183,6 @@ function loadSubCategories(current = null, compareMainCategorySlug = null){
                 option.text = category.name;
                 select.appendChild(option);
             }
-        });
-    });
-}
-async function loadSites(sites){
-    // let response = await fetch('/sites');
-    // response = await response.json();
-    document.querySelectorAll(".site-field").forEach(select => {
-        select.innerHTML = '';
-        let option = document.createElement("option");
-        option.value = '';
-        option.text = 'Select Site';
-        select.appendChild(option);
-        sites.forEach(site => {
-            option = document.createElement("option");
-            option.value = site;
-            option.text = site;
-            select.appendChild(option);
         });
     });
 }
@@ -236,6 +267,52 @@ function editTransaction() {
     form.classList.remove("hide");
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+document.getElementById("add-savingstracker-form").addEventListener("submit", async function(event) {
+    event.preventDefault();
+    const submitButton = document.getElementById("submit-btn");
+    submitButton.disabled = true;
+    submitButton.textContent = "Submitting...";
+    const form = document.getElementById("add-savingstracker-form");
+    const categoryId = form.querySelector('.category-field').value;
+    const subCategoryId = form.querySelector('.sub-category-field').value;
+    const newSubCategory = form.querySelector('.new-sub-category-field').value;
+    const amount = form.querySelector('.amount-field').value;
+    const date = form.querySelector('.date-field').value;
+
+    const formData = {};
+    $(this).serializeArray().forEach(function(item) {
+        formData[item.name] = item.value;
+    });
+    formData.categorySlug = formData.categoryId ? arrangedCategoriesById[formData.categoryId].slug : '';
+    formData.categoryName = formData.categoryId ? arrangedCategoriesById[formData.categoryId].name : '';
+    console.log("formData: ",formData)
+
+    // if(subCategoryId || newSubCategory){
+    if(true){
+        let formSubmitData = await fetch("/transactions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(formData),
+        });
+        formSubmitData = await formSubmitData.json();
+        $("#addTransactionModal").modal("hide");
+        if(formSubmitData.status){
+            await showStatusMessage("Added Successfully!", 'true', [loadCategories, loadTransactions]);
+            document.getElementById("add-savingstracker-collaps-btn").click();
+            form.reset();
+            form.querySelector('.date-field').value = new Date().toISOString().split('T')[0];
+        }else{
+            await showStatusMessage(formSubmitData.error, 'false');
+        }
+    }else{
+        $("#addTransactionModal").modal("hide");
+        await showStatusMessage("Select sub category or enter new one", 'false');
+    }
+    submitButton.disabled = false;
+    submitButton.textContent = "Submit";
+});
 document.getElementById("update-savingstracker-form").addEventListener("submit", async function(event) {
     event.preventDefault();
     const submitButton = document.getElementById("update-btn");
@@ -258,14 +335,14 @@ document.getElementById("update-savingstracker-form").addEventListener("submit",
             body: JSON.stringify({categoryId, subCategoryId, newSubCategory, amount, date, mainCategorySlug: arrangedCategoriesById[categoryId].slug}),
         });
         formSubmitData = await formSubmitData.json();
+        $("#updateTransactionModal").modal("hide");
         if(formSubmitData.status){
-            form.classList.add("hide");
-            await loadCategories();
-            await showStatusMessage('Updated successfuly!', 'true', loadTransactions);
+            await showStatusMessage('Updated successfuly!', 'true', [loadCategories, loadTransactions]);
         }else{
             await showStatusMessage(formSubmitData.message, 'false');
         }
     }else{
+        $("#updateTransactionModal").modal("hide");
         await showStatusMessage("Select sub category or enter new one", 'false');
     }
     submitButton.disabled = false;
@@ -365,7 +442,8 @@ function calculateTotal() {
         savings.totalOnLent += e.amount;
       }
       if (arrangedCategoriesById[e.categoryId].name == "Lent Received") {
-        savings.lent[arrangedCategoriesById[e.subCategoryId]] -= e.amount;
+        if (typeof savings.lent[arrangedCategoriesById[e.subCategoryId].name] == 'undefined') savings.lent[arrangedCategoriesById[e.subCategoryId].name] = 0;
+        savings.lent[arrangedCategoriesById[e.subCategoryId].name] -= e.amount;
         savings.totalAmount -= e.amount;
         savings.totalOnLent -= e.amount;
       }
@@ -415,6 +493,20 @@ function calculateTotal() {
     cell_l.colSpan = 4;
     cell_l.innerHTML = `<b>&#8377;  ${savings.totalAmount.toLocaleString("en-IN")}</b>`;
 }
+$('.new-sub-category-checkbox').on('click', function() {
+    $(this).closest("form").find("input[name='newSubCategory']").val("");
+    $(this).closest("form").find("select.sub-category-field").val("");
+    if ($(this).is(":checked")) {
+        $(this).closest("form").find(".new-sub-category-form-group").removeClass("hide");
+        $(this).closest("form").find(".existing-sub-category-form-group").addClass("hide");
+    } else {
+        $(this).closest("form").find(".new-sub-category-form-group").addClass("hide");
+        $(this).closest("form").find(".existing-sub-category-form-group").removeClass("hide");
+    }
+});
+$("#add-transaction-btn").on("click", function (event) {
+    $("#add-savingstracker-form").find(".amount-field").trigger("focus");
+})
 
 window.onload = async function(){
     await loadCategories();

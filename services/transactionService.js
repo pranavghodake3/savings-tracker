@@ -1,3 +1,4 @@
+const Category = require("../models/categoryModel");
 const transactionModel = require("../models/transactionModel");
 const categoryService = require("../services/categoryService");
 
@@ -18,24 +19,67 @@ const gettransaction = async(id) => {
 };
 
 const create = async(body) => {
-    const { date, categoryId, subCategoryId, newSubCategory, amount, mainCategorySlug } = body;
-    let finalSubCategoryId = subCategoryId;
-    if (newSubCategory) {
-        const newSubCategoryCreated = await categoryService.create({
-            name: newSubCategory,
-            main: false,
-            slug: mainCategorySlug,
+    const { date, categoryId, categoryName, categorySlug, newSubCategory, primarySubCategoryId, secondarySubCategoryId, amount } = body;
+    // let finalSubCategoryId = subCategoryId;
+    let transactionModelObj;
+    let data;
+    if(categoryName == 'Savings'){
+        const transactionModelObj = new transactionModel({
+            date,
+            categoryId,
+            subCategoryId: primarySubCategoryId,
+            amount,
         });
-        finalSubCategoryId = newSubCategoryCreated._id;
+        const data = await transactionModelObj.save();
+    }else if(categoryName == 'Lent'){
+        const withdrawCategory =  await Category.findOne({name: 'Withdraw'});
+        transactionModelObj = new transactionModel({
+            date,
+            categoryId: withdrawCategory._id,
+            subCategoryId: secondarySubCategoryId,
+            amount,
+        });
+        data = await transactionModelObj.save();
+        transactionModelObj = new transactionModel({
+            date,
+            categoryId,
+            subCategoryId: primarySubCategoryId,
+            amount,
+        });
+        data = await transactionModelObj.save();
+    }else if(categoryName == 'Lent Received'){
+        const savingsCategory =  await Category.findOne({name: 'Savings'});
+        transactionModelObj = new transactionModel({
+            date,
+            categoryId,
+            subCategoryId: primarySubCategoryId,
+            amount,
+        });
+        data = await transactionModelObj.save();
+        transactionModelObj = new transactionModel({
+            date,
+            categoryId: savingsCategory._id,
+            subCategoryId: secondarySubCategoryId,
+            amount,
+        });
+        data = await transactionModelObj.save();
     }
+    // if (newSubCategory) {
+    //     const newSubCategoryCreated = await categoryService.create({
+    //         name: newSubCategory,
+    //         main: false,
+    //         slug: categorySlug,
+    //     });
+    //     finalSubCategoryId = newSubCategoryCreated._id;
+    // }
 
-    const transactionModelObj = new transactionModel({
-        date,
-        categoryId,
-        subCategoryId: finalSubCategoryId,
-        amount,
-    });
-    const data = await transactionModelObj.save();
+    // const transactionModelObj = new transactionModel({
+    //     date,
+    //     categoryId,
+    //     subCategoryId: finalSubCategoryId,
+    //     amount,
+    // });
+    // const data = await transactionModelObj.save();
 
     return data;
 };
