@@ -83,6 +83,24 @@ const create = async(body) => {
         });
         transaction = await transactionModelObj.save();
         data.push(transaction);
+    }else if(categoryName == 'Kharch'){
+        const savingsCategory =  await Category.findOne({name: 'Savings'});
+        transactionModelObj = new transactionModel({
+            date,
+            categoryId,
+            subCategoryId: finalSubCategoryId,
+            amount,
+        });
+        transaction = await transactionModelObj.save();
+        data.push(transaction);
+        // transactionModelObj = new transactionModel({
+        //     date,
+        //     categoryId: savingsCategory._id,
+        //     subCategoryId: secondarySubCategoryId,
+        //     amount,
+        // });
+        // transaction = await transactionModelObj.save();
+        // data.push(transaction);
     }
 
     return data;

@@ -137,3 +137,10 @@ form{
 .new-sub-category-check{
     text-align: left;
 }
+.search-input{
+    margin-bottom: 5px;
+    text-align: left;
+}
+.panel-group.expense-stats{
+    margin-bottom: 5px;
+}
